@@ -125,6 +125,64 @@
       position: relative;
     }
 
+    /* Блокуючий оверлей */
+    .player-blocker {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.01); /* Майже прозорий */
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: not-allowed;
+      transition: background 0.3s;
+    }
+
+    .player-blocker.hidden {
+      display: none;
+    }
+
+    .player-blocker:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .blocker-message {
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-align: center;
+      color: white;
+      pointer-events: none;
+    }
+
+    .player-blocker:hover .blocker-message {
+      opacity: 1;
+    }
+
+    .blocker-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      animation: pulse-icon 2s infinite;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .blocker-message p {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .blocker-message small {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
     .controls-bar {
       background: #252525;
       padding: 20px 25px;
@@ -483,6 +541,14 @@
 
         <div class="player-wrapper">
           <div id="live-player"></div>
+          <!-- Блокуючий оверлей -->
+          <div class="player-blocker" id="playerBlocker">
+            <div class="blocker-message">
+              <div class="blocker-icon">🔴</div>
+              <p>Це пряма трансляція</p>
+              <small>Керування через кнопки нижче</small>
+            </div>
+          </div>
         </div>
 
         <div class="controls-bar">
@@ -602,6 +668,7 @@
         document.getElementById('stopBtn').style.display = 'inline-flex';
         document.getElementById('qualitySelect').disabled = false;
         document.getElementById('timezoneSelect').disabled = false;
+        document.getElementById('playerBlocker').classList.add('hidden'); // ← Ховаємо блокувальник
         updateCurrentVideo(liveStream);
         updateLiveSchedule(liveStream);
       },
@@ -629,6 +696,7 @@
       document.getElementById('stopBtn').style.display = 'none';
       document.getElementById('qualitySelect').disabled = true;
       document.getElementById('timezoneSelect').disabled = true;
+      document.getElementById('playerBlocker').classList.remove('hidden'); // ← Показуємо блокувальник
     });
 
     document.getElementById('qualitySelect').addEventListener('change', (e) => {
