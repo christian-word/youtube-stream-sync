@@ -369,10 +369,35 @@
     }
 
     setQuality(quality) {
-      if (this.player && this.player.setPlaybackQuality) {
-        this.player.setPlaybackQuality(quality);
-        this._showToast(`Якість: ${quality}`);
+      this.options.quality = quality;
+      
+      // YouTube setPlaybackQuality не працює надійно
+      // Потрібно перезавантажити відео з новою якістю
+      if (this.player && this.player.getVideoData && this.currentVideoIndex >= 0) {
+        const currentTime = this.player.getCurrentTime();
+        const currentVideo = this.broadcastProgram.programSchedule[this.currentVideoIndex];
+        
+        if (currentVideo) {
+          this.player.loadVideoById({
+            videoId: currentVideo.videoId,
+            startSeconds: currentTime,
+            suggestedQuality: quality
+          });
+        }
       }
+      
+      this._showToast(`Якість змінено: ${this._getQualityName(quality)}`);
+    }
+
+    _getQualityName(quality) {
+      const names = {
+        'small': '360p',
+        'medium': '480p',
+        'large': '720p',
+        'hd1080': '1080p',
+        'default': 'Авто'
+      };
+      return names[quality] || quality;
     }
 
     getCurrentVideo() {

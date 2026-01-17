@@ -501,6 +501,15 @@
             <option value="medium">📺 480p</option>
             <option value="small">📱 360p</option>
           </select>
+          <select class="quality-select" id="timezoneSelect" disabled>
+            <option value="0">⏰ Поточний час</option>
+            <option value="3600">⏩ +1 година</option>
+            <option value="7200">⏩ +2 години</option>
+            <option value="10800">⏩ +3 години</option>
+            <option value="-3600">⏪ -1 година</option>
+            <option value="-7200">⏪ -2 години</option>
+            <option value="-10800">⏪ -3 години</option>
+          </select>
         </div>
       </div>
 
@@ -592,6 +601,7 @@
         document.getElementById('startBtn').style.display = 'none';
         document.getElementById('stopBtn').style.display = 'inline-flex';
         document.getElementById('qualitySelect').disabled = false;
+        document.getElementById('timezoneSelect').disabled = false;
         updateCurrentVideo(liveStream);
         updateLiveSchedule(liveStream);
       },
@@ -618,10 +628,16 @@
       document.getElementById('startBtn').style.display = 'inline-flex';
       document.getElementById('stopBtn').style.display = 'none';
       document.getElementById('qualitySelect').disabled = true;
+      document.getElementById('timezoneSelect').disabled = true;
     });
 
     document.getElementById('qualitySelect').addEventListener('change', (e) => {
       liveStream.setQuality(e.target.value);
+    });
+
+    document.getElementById('timezoneSelect').addEventListener('change', (e) => {
+      liveStream.options.timezone = parseInt(e.target.value);
+      liveStream.play(); // Перезапуск з новим часом
     });
 
     // Ініціалізація розкладу
