@@ -547,6 +547,8 @@
       onPlay: (index) => {
         console.log('▶️ Відтворення відео:', index);
         updateCurrentInfo(stream);
+        updateCustomSchedule(stream);  // ← ДОДАЛИ ТУТ
+        updateStats(stream);
       },
       
       onVideoChange: (index, video) => {
@@ -599,7 +601,6 @@
         
         li.onclick = () => {
           stream.goToVideo(index);
-          updateCustomSchedule(stream);
         };
         
         container.appendChild(li);
@@ -607,8 +608,6 @@
       
       // Оновлюємо бейдж
       document.getElementById('schedule-badge').textContent = `${schedule.length} відео`;
-      
-      updateCustomSchedule(stream);
     }
 
     // Оновлення UI розкладу
