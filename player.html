@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Моя трансляція</title>
+</head>
+<body>
+  <div id="my-stream"></div>
+
+  <!-- Підключити один файл -->
+  <script src="youtube-stream-sync.js"></script>
+  
+  <script>
+    // Ініціалізувати
+    const stream = new YouTubeStreamSync({
+      container: '#my-stream',
+      playlistUrl: 'my-playlist.json'
+    });
+  </script>
+</body>
+</html>
