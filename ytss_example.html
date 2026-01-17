@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Stream Sync - Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+    }
+    
+    .demo-section {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .demo-section h2 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #D4AF37;
+      padding-bottom: 10px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #D4AF37;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #C19B2F;
+    }
+    
+    .btn-secondary {
+      background: #6B7280;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #4B5563;
+    }
+    
+    .info-box {
+      background: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    
+    .code-block {
+      background: #1F2937;
+      color: #E5E7EB;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    
+    .footer {
+      text-align: center;
+      color: #666;
+      margin-top: 40px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📺 YouTube Stream Sync Library</h1>
+    <p class="subtitle">Демонстрація можливостей бібліотеки</p>
+
+    <!-- ПРИКЛАД 1: Базовий -->
+    <div class="demo-section">
+      <h2>1️⃣ Базовий приклад</h2>
+      <p>Простий плеєр зі всіма контролями</p>
+      
+      <div id="stream-basic"></div>
+      
+      <div class="info-box">
+        <strong>Код ініціалізації:</strong>
+        <div class="code-block">
+const stream1 = new YouTubeStreamSync({
+  container: '#stream-basic',
+  playlistUrl: 'https://example.com/playlist.json',
+  theme: 'light'
+});
+        </div>
+      </div>
+    </div>
+
+    <!-- ПРИКЛАД 2: Темна тема -->
+    <div class="demo-section">
+      <h2>2️⃣ Темна тема</h2>
+      <p>Плеєр з темною темою</p>
+      
+      <div id="stream-dark"></div>
+      
+      <div class="info-box">
+        <strong>Код ініціалізації:</strong>
+        <div class="code-block">
+const stream2 = new YouTubeStreamSync({
+  container: '#stream-dark',
+  playlistUrl: 'https://example.com/playlist.json',
+  theme: 'dark'
+});
+        </div>
+      </div>
+    </div>
+
+    <!-- ПРИКЛАД 3: Без розкладу -->
+    <div class="demo-section">
+      <h2>3️⃣ Мінімалістичний (без розкладу)</h2>
+      <p>Тільки плеєр без додаткових елементів</p>
+      
+      <div id="stream-minimal"></div>
+      
+      <div class="info-box">
+        <strong>Код ініціалізації:</strong>
+        <div class="code-block">
+const stream3 = new YouTubeStreamSync({
+  container: '#stream-minimal',
+  playlistUrl: 'https://example.com/playlist.json',
+  showSchedule: false
+});
+        </div>
+      </div>
+    </div>
+
+    <!-- ПРИКЛАД 4: З callbacks -->
+    <div class="demo-section">
+      <h2>4️⃣ З обробниками подій</h2>
+      <p>Демонстрація роботи з callbacks</p>
+      
+      <div id="stream-callbacks"></div>
+      
+      <div id="event-log" style="background: #F3F4F6; padding: 15px; border-radius: 8px; margin-top: 20px; max-height: 200px; overflow-y: auto;">
+        <strong>Лог подій:</strong>
+        <div id="log-content" style="font-family: monospace; font-size: 12px; margin-top: 10px;"></div>
+      </div>
+      
+      <div class="info-box">
+        <strong>Код ініціалізації:</strong>
+        <div class="code-block">
+const stream4 = new YouTubeStreamSync({
+  container: '#stream-callbacks',
+  playlistUrl: 'https://example.com/playlist.json',
+  onReady: (instance) => {
+    console.log('✅ Готовий!');
+  },
+  onPlay: (videoIndex) => {
+    console.log('▶️ Відтворення:', videoIndex);
+  },
+  onVideoChange: (index, video) => {
+    console.log('🔄 Зміна відео:', video.title);
+  }
+});
+        </div>
+      </div>
+    </div>
+
+    <!-- ПРИКЛАД 5: API методи -->
+    <div class="demo-section">
+      <h2>5️⃣ Керування через API</h2>
+      <p>Тестування публічних методів бібліотеки</p>
+      
+      <div id="stream-api"></div>
+      
+      <div class="controls">
+        <button class="btn btn-primary" onclick="testAPI.play()">▶ Play</button>
+        <button class="btn btn-secondary" onclick="testAPI.pause()">⏸ Pause</button>
+        <button class="btn btn-secondary" onclick="testAPI.stop()">⏹ Stop</button>
+        <button class="btn btn-secondary" onclick="testAPI.setQuality('hd1080')">🎬 1080p</button>
+        <button class="btn btn-secondary" onclick="testAPI.getCurrentVideo()">ℹ️ Current Video</button>
+      </div>
+      
+      <div class="info-box">
+        <strong>Доступні методи:</strong>
+        <ul>
+          <li><code>play()</code> - почати відтворення</li>
+          <li><code>pause()</code> - призупинити</li>
+          <li><code>stop()</code> - зупинити</li>
+          <li><code>setQuality(quality)</code> - змінити якість</li>
+          <li><code>getCurrentVideo()</code> - отримати поточне відео</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p><strong>YouTube Stream Sync Library v1.0.0</strong></p>
+      <p>Створено для розробників | MIT License</p>
+    </div>
+  </div>
+
+  <!-- Підключення бібліотеки -->
+  <script src="youtube-stream-sync.js"></script>
+
+  <script>
+    // ВАЖЛИВО: Замініть URL на ваш реальний плейлист
+    const PLAYLIST_URL = 'https://raw.githubusercontent.com/christian-word/hristian-media/main/json/livestream_daily.json';
+
+    // Приклад 1: Базовий
+    const stream1 = new YouTubeStreamSync({
+      container: '#stream-basic',
+      playlistUrl: PLAYLIST_URL,
+      theme: 'light'
+    });
+
+    // Приклад 2: Темна тема
+    const stream2 = new YouTubeStreamSync({
+      container: '#stream-dark',
+      playlistUrl: PLAYLIST_URL,
+      theme: 'dark'
+    });
+
+    // Приклад 3: Мінімалістичний
+    const stream3 = new YouTubeStreamSync({
+      container: '#stream-minimal',
+      playlistUrl: PLAYLIST_URL,
+      showSchedule: false
+    });
+
+    // Приклад 4: З callbacks
+    const logContainer = document.getElementById('log-content');
+    
+    function addLog(message) {
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.textContent = `[${time}] ${message}`;
+      entry.style.marginBottom = '5px';
+      logContainer.insertBefore(entry, logContainer.firstChild);
+    }
+
+    const stream4 = new YouTubeStreamSync({
+      container: '#stream-callbacks',
+      playlistUrl: PLAYLIST_URL,
+      onReady: (instance) => {
+        addLog('✅ Плеєр готовий!');
+      },
+      onPlay: (videoIndex) => {
+        addLog('▶️ Відтворення відео #' + (videoIndex + 1));
+      },
+      onVideoChange: (index, video) => {
+        addLog('🔄 Зміна відео: ' + (video.title || 'Відео #' + (index + 1)));
+      },
+      onError: (error) => {
+        addLog('❌ Помилка: ' + error.message);
+      }
+    });
+
+    // Приклад 5: API
+    const testAPI = new YouTubeStreamSync({
+      container: '#stream-api',
+      playlistUrl: PLAYLIST_URL
+    });
+
+    // Розширюємо методи для демонстрації
+    testAPI.getCurrentVideo = function() {
+      const video = YouTubeStreamSync.prototype.getCurrentVideo.call(this);
+      if (video) {
+        alert('Поточне відео:\n' + JSON.stringify(video, null, 2));
+      } else {
+        alert('Відео ще не відтворюється');
+      }
+    };
+
+    // Виведення версії в консоль
+    console.log('YouTube Stream Sync Library v' + YouTubeStreamSync.version);
+  </script>
+</body>
+</html>
