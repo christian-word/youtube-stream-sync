@@ -1,6 +1,6 @@
-﻿/**
+/**
  * YouTube Stream Sync Library
- * Версія: 1.0.0
+ * Версія: 1.0.1
  * Ліцензія: MIT
  * 
  * Бібліотека для створення 24/7 YouTube трансляцій з автоматичною синхронізацією
@@ -9,7 +9,7 @@
 (function(window) {
   'use strict';
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
 
   class YouTubeStreamSync {
     
@@ -24,6 +24,9 @@
         locale: 'uk-UA',
         timezone: 0,
         quality: 'default',
+        width: '100%',
+        maxWidth: null,
+        aspectRatio: '16:9',
         customStyles: null,
         onReady: null,
         onPlay: null,
@@ -90,11 +93,12 @@
 
     _createUI() {
       const uniqueId = 'ytss-' + Math.random().toString(36).substr(2, 9);
+      const aspectRatioPadding = this._calculateAspectRatio();
       
       this.container.innerHTML = `
-        <div class="ytss-wrapper" data-theme="${this.options.theme}">
+        <div class="ytss-wrapper" data-theme="${this.options.theme}" style="width: ${this.options.width}; ${this.options.maxWidth ? 'max-width: ' + this.options.maxWidth : ''}">
           <div class="ytss-player-container">
-            <div class="ytss-player-wrapper">
+            <div class="ytss-player-wrapper" style="padding-bottom: ${aspectRatioPadding}%">
               <div id="${uniqueId}-player" class="ytss-player"></div>
               
               <div class="ytss-live-indicator" style="display: none;">
@@ -234,7 +238,7 @@
         .ytss-wrapper[data-theme="light"]{--ytss-bg:#fff;--ytss-text:#2B2D42;--ytss-border:#e5e7eb;--ytss-primary:#D4AF37}
         .ytss-wrapper[data-theme="dark"]{--ytss-bg:#18181B;--ytss-text:#EFEFEF;--ytss-border:#27272A;--ytss-primary:#9146FF}
         .ytss-player-container{background:var(--ytss-bg);border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.1)}
-        .ytss-player-wrapper{position:relative;padding-bottom:56.25%;height:0}
+        .ytss-player-wrapper{position:relative;width:100%;height:0}
         .ytss-player{position:absolute;top:0;left:0;width:100%;height:100%}
         .ytss-live-indicator{position:absolute;top:12px;left:12px;background:rgba(239,68,68,.9);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;z-index:10;display:flex;align-items:center;gap:6px}
         .ytss-pulse-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:ytss-pulse 1.5s infinite}
@@ -335,6 +339,8 @@
       }
     }
 
+    // ========== ПУБЛІЧНІ МЕТОДИ API ==========
+
     play() {
       if (!this.broadcastProgram) {
         this._showToast('Плейлист ще не завантажено');
@@ -374,6 +380,63 @@
       return this.broadcastProgram.programSchedule[this.currentVideoIndex];
     }
 
+    getPlaylist() {
+      return this.broadcastProgram;
+    }
+
+    getSchedule() {
+      if (!this.broadcastProgram) return [];
+      return this.broadcastProgram.programSchedule;
+    }
+
+    getCurrentIndex() {
+      return this.currentVideoIndex;
+    }
+
+    goToVideo(index) {
+      if (!this.broadcastProgram || index < 0 || index >= this.broadcastProgram.programSchedule.length) {
+        console.warn('Невірний індекс відео');
+        return;
+      }
+
+      this.currentVideoIndex = index;
+      const video = this.broadcastProgram.programSchedule[index];
+      
+      if (this.player && video) {
+        this.player.loadVideoById({
+          videoId: video.videoId,
+          startSeconds: 0,
+          suggestedQuality: this.options.quality
+        });
+        this._highlightCurrent();
+        
+        if (typeof this.options.onVideoChange === 'function') {
+          this.options.onVideoChange(index, video);
+        }
+      }
+    }
+
+    getBroadcastStartTime() {
+      if (!this.broadcastProgram) return null;
+      return new Date(this.broadcastProgram.broadcastStartTime);
+    }
+
+    on(eventName, callback) {
+      const events = ['ready', 'play', 'videoChange', 'error'];
+      if (!events.includes(eventName)) {
+        console.warn(`Невідома подія: ${eventName}`);
+        return;
+      }
+
+      const optionName = 'on' + eventName.charAt(0).toUpperCase() + eventName.slice(1);
+      const existingCallback = this.options[optionName];
+      
+      this.options[optionName] = (...args) => {
+        if (existingCallback) existingCallback(...args);
+        callback(...args);
+      };
+    }
+
     destroy() {
       this._clearTimers();
       if (this.player && this.player.destroy) {
@@ -381,6 +444,8 @@
       }
       this.container.innerHTML = '';
     }
+
+    // ========== ВНУТРІШНІ МЕТОДИ ==========
 
     _startBroadcast() {
       const offset = this.options.timezone;
@@ -432,7 +497,7 @@
 
         const videoData = this._findCurrentVideo(elapsed);
         
-        if (videoData.index !== this.currentVideoIndex) {
+        if (videoData.index !== -1 && videoData.index !== this.currentVideoIndex) {
           this.currentVideoIndex = videoData.index;
           this.player.loadVideoById({
             videoId: videoData.video.videoId,
@@ -447,11 +512,13 @@
           }
         }
 
-        const drift = this.player.getCurrentTime() - videoData.seconds;
-        if (Math.abs(drift) > 1) {
-          this.player.setPlaybackRate(drift > 0 ? 0.9 : 1.1);
-        } else {
-          this.player.setPlaybackRate(1);
+        if (videoData.seconds !== undefined) {
+          const drift = this.player.getCurrentTime() - videoData.seconds;
+          if (Math.abs(drift) > 1) {
+            this.player.setPlaybackRate(drift > 0 ? 0.9 : 1.1);
+          } else {
+            this.player.setPlaybackRate(1);
+          }
         }
       }, 1000);
 
@@ -574,6 +641,26 @@
         this.watchedVideos.push(videoId);
         localStorage.setItem('ytss-watched', JSON.stringify(this.watchedVideos));
       }
+    }
+
+    _calculateAspectRatio() {
+      const ratio = this.options.aspectRatio;
+      
+      if (ratio === '16:9') return 56.25;
+      if (ratio === '4:3') return 75;
+      if (ratio === '21:9') return 42.86;
+      if (ratio === '1:1') return 100;
+      
+      if (typeof ratio === 'string' && ratio.includes(':')) {
+        const [w, h] = ratio.split(':').map(Number);
+        return (h / w) * 100;
+      }
+      
+      if (typeof ratio === 'number') {
+        return ratio * 100;
+      }
+      
+      return 56.25;
     }
 
     _handleError(error) {
