@@ -125,6 +125,31 @@
       position: relative;
     }
 
+    /* АГРЕСИВНЕ блокування YouTube контролів */
+    #live-player iframe {
+      pointer-events: none !important; /* Блокуємо ВСІ кліки */
+    }
+
+    /* Дозволяємо кліки тільки на нашому оверлеї */
+    .player-blocker,
+    .custom-volume-control {
+      pointer-events: auto !important;
+    }
+
+    /* Ховаємо YouTube контроли через CSS */
+    #live-player .ytp-chrome-bottom,
+    #live-player .ytp-chrome-top,
+    #live-player .ytp-gradient-bottom,
+    #live-player .ytp-gradient-top,
+    #live-player .ytp-pause-overlay,
+    #live-player .ytp-cards-teaser,
+    #live-player .ytp-watermark,
+    #live-player .ytp-show-cards-title {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
     /* Блокуючий оверлей */
     .player-blocker {
       position: absolute;
@@ -137,15 +162,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: not-allowed;
+      cursor: default; /* Змінив з not-allowed на default */
       transition: background 0.3s;
+      pointer-events: auto; /* Дозволяємо кліки */
     }
 
     .player-blocker.hidden {
-      display: none;
+      pointer-events: none; /* Коли прихований - пропускаємо кліки */
+      opacity: 0;
     }
 
-    .player-blocker:hover {
+    .player-blocker:not(.hidden):hover {
       background: rgba(0, 0, 0, 0.7);
     }
 
