@@ -730,6 +730,61 @@
       return `${minutes}:${secs.toString().padStart(2, '0')}`;
     }
 
+    // Ініціалізація кастомного регулятора гучності
+    function initVolumeControl(stream) {
+      // Чекаємо поки player буде готовий
+      setTimeout(() => {
+        const volumeControl = document.querySelector('.ytss-volume-control');
+        const volumeSlider = document.querySelector('.ytss-volume-slider');
+        const volumeIcon = document.querySelector('.ytss-volume-icon');
+        
+        if (!volumeControl || !volumeSlider || !volumeIcon || !stream.player) return;
+        
+        // Показуємо контрол гучності
+        volumeControl.style.display = 'flex';
+        
+        // Встановлюємо початкову гучність
+        stream.player.setVolume(100);
+        volumeSlider.value = 100;
+        
+        // Обробник зміни гучності
+        volumeSlider.addEventListener('input', (e) => {
+          const volume = parseInt(e.target.value);
+          stream.player.setVolume(volume);
+          
+          if (volume === 0) {
+            volumeIcon.textContent = '🔇';
+          } else if (volume < 50) {
+            volumeIcon.textContent = '🔉';
+          } else {
+            volumeIcon.textContent = '🔊';
+          }
+        });
+        
+        // Обробник кліку по іконці (mute/unmute)
+        let previousVolume = 100;
+        volumeIcon.addEventListener('click', () => {
+          const currentVolume = parseInt(volumeSlider.value);
+          
+          if (currentVolume > 0) {
+            previousVolume = currentVolume;
+            volumeSlider.value = 0;
+            stream.player.setVolume(0);
+            volumeIcon.textContent = '🔇';
+          } else {
+            volumeSlider.value = previousVolume;
+            stream.player.setVolume(previousVolume);
+            
+            if (previousVolume < 50) {
+              volumeIcon.textContent = '🔉';
+            } else {
+              volumeIcon.textContent = '🔊';
+            }
+          }
+        });
+      }, 1000);
+    }
+
     // Показати попередження про LIVE режим
     function showLiveWarning() {
       const toast = document.getElementById('liveToast');
@@ -749,6 +804,7 @@
       width: '100%',
       aspectRatio: '16:9',
       autoplay: false,
+      strictLiveMode: true,  // ← ВКЛЮЧАЄМО STRICT MODE!
       
       // Приховуємо вбудовані елементи (ми створили свої)
       showSchedule: false,
@@ -758,6 +814,7 @@
         console.log('🔴 LIVE стрім готовий!');
         renderCustomSchedule(instance);
         updateStats(instance);
+        initVolumeControl(instance);
       },
       
       onPlay: (index) => {
