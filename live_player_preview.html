@@ -205,12 +205,11 @@
       border-left: 4px solid transparent;
       transition: all 0.3s;
       position: relative;
-      cursor: pointer;
+      cursor: default;
     }
 
     .schedule-item:hover {
       background: #2a2a2a;
-      transform: translateX(5px);
     }
 
     /* ПРЕВЬЮ ВИД */
@@ -256,7 +255,7 @@
     }
 
     .schedule-item:hover .thumbnail-overlay {
-      opacity: 1;
+      opacity: 0;
     }
 
     .play-icon {
@@ -454,6 +453,37 @@
       line-height: 1.6;
     }
 
+    /* Toast повідомлення */
+    .live-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+      font-weight: 600;
+      z-index: 10000;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 90%;
+    }
+
+    .live-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .live-toast-icon {
+      font-size: 1.5rem;
+      animation: pulse 1s infinite;
+    }
+
     @media (max-width: 1024px) {
       .main-content {
         grid-template-columns: 1fr;
@@ -570,12 +600,17 @@
     </div>
   </div>
 
+  <!-- Toast повідомлення -->
+  <div class="live-toast" id="liveToast">
+    <span class="live-toast-icon">🔴</span>
+    <span>Це пряма трансляція 24/7! Всі дивляться синхронно.</span>
+  </div>
+
   <!-- Підключення бібліотеки YouTubeStreamSync -->
   <script src="youtube-stream-sync.js"></script>
 
   <script>
     let currentViewMode = 'preview';
-    let isStreamStarted = false; // Прапорець стану трансляції
 
     // Функція отримання превью YouTube
     function getYouTubeThumbnail(videoId, quality = 'mqdefault') {
@@ -592,6 +627,16 @@
         return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
       }
       return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Показати попередження про LIVE режим
+    function showLiveWarning() {
+      const toast = document.getElementById('liveToast');
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
     }
 
     // Ініціалізація LIVE стріму з YouTubeStreamSync
@@ -616,7 +661,6 @@
       
       onPlay: (index) => {
         console.log('▶️ Трансляція розпочата');
-        isStreamStarted = true; // Встановлюємо прапорець
         updateCurrentVideo(liveStream);
         updateScheduleHighlight(liveStream);
       },
@@ -690,14 +734,12 @@
           `;
         }
 
-        // Клік по відео - перехід (тільки якщо трансляція запущена)
-        li.addEventListener('click', () => {
-          if (!isStreamStarted) {
-            // Показуємо повідомлення, що потрібно спочатку запустити трансляцію
-            showNotification('⚠️ Спочатку запустіть трансляцію!');
-            return;
-          }
-          liveStream.goToVideo(index);
+        // Клік по відео заблокований для збереження синхронізації LIVE
+        li.style.cursor = 'default';
+        li.addEventListener('click', (e) => {
+          e.preventDefault();
+          // Показуємо повідомлення що це LIVE трансляція
+          showLiveWarning();
         });
         
         container.appendChild(li);
@@ -757,46 +799,6 @@
       document.getElementById('stat-start-time').textContent = 
         startTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
     }
-
-    // Функція показу повідомлення
-    function showNotification(message) {
-      // Створюємо тимчасове повідомлення
-      const notification = document.createElement('div');
-      notification.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-        padding: 20px 40px;
-        border-radius: 16px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        box-shadow: 0 10px 40px rgba(239, 68, 68, 0.5);
-        z-index: 10000;
-        animation: fadeInOut 2s ease-in-out;
-      `;
-      notification.textContent = message;
-      document.body.appendChild(notification);
-      
-      // Видаляємо через 2 секунди
-      setTimeout(() => {
-        notification.remove();
-      }, 2000);
-    }
-
-    // Додаємо CSS анімацію
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes fadeInOut {
-        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-        15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-      }
-    `;
-    document.head.appendChild(style);
 
     // Перемикання режиму перегляду
     document.querySelectorAll('.view-btn').forEach(btn => {
