@@ -575,6 +575,7 @@
 
   <script>
     let currentViewMode = 'preview';
+    let isStreamStarted = false; // Прапорець стану трансляції
 
     // Функція отримання превью YouTube
     function getYouTubeThumbnail(videoId, quality = 'mqdefault') {
@@ -615,6 +616,7 @@
       
       onPlay: (index) => {
         console.log('▶️ Трансляція розпочата');
+        isStreamStarted = true; // Встановлюємо прапорець
         updateCurrentVideo(liveStream);
         updateScheduleHighlight(liveStream);
       },
@@ -688,8 +690,13 @@
           `;
         }
 
-        // Клік по відео - перехід (через YouTubeStreamSync API)
+        // Клік по відео - перехід (тільки якщо трансляція запущена)
         li.addEventListener('click', () => {
+          if (!isStreamStarted) {
+            // Показуємо повідомлення, що потрібно спочатку запустити трансляцію
+            showNotification('⚠️ Спочатку запустіть трансляцію!');
+            return;
+          }
           liveStream.goToVideo(index);
         });
         
@@ -750,6 +757,46 @@
       document.getElementById('stat-start-time').textContent = 
         startTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
     }
+
+    // Функція показу повідомлення
+    function showNotification(message) {
+      // Створюємо тимчасове повідомлення
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        box-shadow: 0 10px 40px rgba(239, 68, 68, 0.5);
+        z-index: 10000;
+        animation: fadeInOut 2s ease-in-out;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      // Видаляємо через 2 секунди
+      setTimeout(() => {
+        notification.remove();
+      }, 2000);
+    }
+
+    // Додаємо CSS анімацію
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+      }
+    `;
+    document.head.appendChild(style);
 
     // Перемикання режиму перегляду
     document.querySelectorAll('.view-btn').forEach(btn => {
