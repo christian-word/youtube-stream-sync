@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔴 LIVE Трансляція 24/7 | Дім Євангелія</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0a0a0a;
+      min-height: 100vh;
+      color: white;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Шапка з LIVE індикатором */
+    .live-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+      border-radius: 16px;
+      border: 2px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .live-badge-large {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #ef4444;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      box-shadow: 0 8px 30px rgba(239, 68, 68, 0.5);
+      animation: pulse-badge 2s infinite;
+    }
+
+    @keyframes pulse-badge {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 30px rgba(239, 68, 68, 0.5); }
+      50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(239, 68, 68, 0.7); }
+    }
+
+    .live-badge-large::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .live-header h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .live-header p {
+      color: rgba(255,255,255,0.7);
+      font-size: 1.1rem;
+    }
+
+    /* Основний контент */
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    /* Плеєр */
+    .player-section {
+      background: #1a1a1a;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .stream-info-bar {
+      background: linear-gradient(135deg, #2D6A4F, #457B9D);
+      padding: 20px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stream-info-bar h2 {
+      font-size: 1.3rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .viewers-count {
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .player-wrapper {
+      position: relative;
+    }
+
+    /* Блокуючий оверлей */
+    .player-blocker {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.01);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: not-allowed;
+      transition: background 0.3s;
+    }
+
+    .player-blocker.hidden {
+      display: none;
+    }
+
+    .player-blocker:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .blocker-message {
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-align: center;
+      color: white;
+      pointer-events: none;
+    }
+
+    .player-blocker:hover .blocker-message {
+      opacity: 1;
+    }
+
+    .blocker-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      animation: pulse-icon 2s infinite;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .blocker-message p {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .blocker-message small {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .controls-bar {
+      background: #252525;
+      padding: 20px 25px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-live {
+      padding: 14px 30px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-start {
+      background: #ef4444;
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-start:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    }
+
+    .btn-stop {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-stop:hover {
+      background: #4b5563;
+    }
+
+    .quality-select {
+      padding: 14px 20px;
+      border-radius: 50px;
+      border: 2px solid #3a3a3a;
+      background: #1a1a1a;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      flex: 1;
+      min-width: 150px;
+      transition: all 0.3s;
+    }
+
+    .quality-select:hover {
+      border-color: #D4AF37;
+    }
+
+    .quality-select:focus {
+      outline: none;
+      border-color: #D4AF37;
+    }
+
+    /* Розклад */
+    .schedule-section {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      max-height: 800px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .schedule-header {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #D4AF37;
+    }
+
+    .schedule-header h2 {
+      color: white;
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .schedule-subtitle {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+    }
+
+    /* НОВА: Кнопка перемикання режиму */
+    .view-toggle {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .toggle-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid #3a3a3a;
+      background: #252525;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .toggle-btn:hover {
+      border-color: #D4AF37;
+      color: white;
+    }
+
+    .toggle-btn.active {
+      background: #D4AF37;
+      border-color: #D4AF37;
+      color: #1a1a1a;
+    }
+
+    .schedule-list {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 10px;
+    }
+
+    .schedule-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .schedule-list::-webkit-scrollbar-track {
+      background: #252525;
+      border-radius: 4px;
+    }
+
+    .schedule-list::-webkit-scrollbar-thumb {
+      background: #D4AF37;
+      border-radius: 4px;
+    }
+
+    .schedule-item {
+      background: #252525;
+      padding: 18px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      border-left: 4px solid transparent;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .schedule-item.played {
+      opacity: 0.4;
+    }
+
+    .schedule-item.current {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(45, 106, 79, 0.15));
+      border-left-color: #D4AF37;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .schedule-item.current::before {
+      content: '▶';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #D4AF37;
+      font-size: 24px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .item-number {
+      display: inline-block;
+      background: #3a3a3a;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 32px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-right: 12px;
+    }
+
+    .schedule-item.current .item-number {
+      background: #D4AF37;
+      color: #1a1a1a;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .schedule-item.played .item-number {
+      background: #1a1a1a;
+    }
+
+    .item-title {
+      font-weight: 600;
+      color: white;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .item-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      flex-wrap: wrap;
+    }
+
+    /* НОВА: Стилі для превью */
+    .schedule-item.with-preview {
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .item-preview {
+      width: 120px;
+      height: 68px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #1a1a1a;
+      position: relative;
+    }
+
+    .item-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .status-live-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ef4444;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .status-live-small::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+
+    /* Інфо панель */
+    .info-panel {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 25px;
+      margin-top: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .info-card {
+      background: #252525;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .info-card:hover {
+      border-color: #D4AF37;
+      transform: translateY(-3px);
+    }
+
+    .info-icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .info-label {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .info-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* Примітка */
+    .notice {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 16px;
+      padding: 20px 25px;
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .notice-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .notice-content h3 {
+      color: white;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    .notice-content p {
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+
+    /* Адаптивність */
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      .live-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .live-badge-large {
+        font-size: 1.2rem;
+        padding: 10px 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      .controls-bar {
+        flex-direction: column;
+      }
+
+      .btn-live, .quality-select {
+        width: 100%;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stream-info-bar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .item-preview {
+        width: 100px;
+        height: 56px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- LIVE Header -->
+    <div class="live-header">
+      <div class="live-badge-large">ПРЯМИЙ ЕФІР</div>
+      <h1>🎬 Цілодобова трансляція служінь</h1>
+      <p>Дім Євангелія • Церква м. Суми</p>
+    </div>
+
+    <!-- Основний контент -->
+    <div class="main-content">
+      <!-- Плеєр -->
+      <div class="player-section">
+        <div class="stream-info-bar">
+          <h2>
+            <span>📺</span>
+            <span id="current-video-title">Очікування...</span>
+          </h2>
+          <div class="viewers-count">
+            <span>👥</span>
+            <span>Онлайн трансляція</span>
+          </div>
+        </div>
+
+        <div class="player-wrapper">
+          <div id="live-player"></div>
+          <!-- Блокуючий оверлей -->
+          <div class="player-blocker" id="playerBlocker">
+            <div class="blocker-message">
+              <div class="blocker-icon">🔴</div>
+              <p>Це пряма трансляція</p>
+              <small>Керування через кнопки нижче</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-bar">
+          <button class="btn-live btn-start" id="startBtn">
+            <span>🔴</span>
+            <span>Дивитися трансляцію</span>
+          </button>
+          <button class="btn-live btn-stop" id="stopBtn" style="display: none;">
+            <span>⏹</span>
+            <span>Зупинити</span>
+          </button>
+          <select class="quality-select" id="qualitySelect" disabled>
+            <option value="default">📡 Якість: Авто</option>
+            <option value="hd1080">⚡ 1080p (Full HD)</option>
+            <option value="large">🖥️ 720p (HD)</option>
+            <option value="medium">📺 480p</option>
+            <option value="small">📱 360p</option>
+          </select>
+          <select class="quality-select" id="timezoneSelect" disabled>
+            <option value="0">⏰ Поточний час</option>
+            <option value="3600">⏩ +1 година</option>
+            <option value="7200">⏩ +2 години</option>
+            <option value="10800">⏩ +3 години</option>
+            <option value="-3600">⏪ -1 година</option>
+            <option value="-7200">⏪ -2 години</option>
+            <option value="-10800">⏪ -3 години</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Розклад -->
+      <div class="schedule-section">
+        <div class="schedule-header">
+          <h2>📋 Програма трансляції</h2>
+          <p class="schedule-subtitle">Що йде зараз та далі по розкладу</p>
+          <!-- НОВА: Кнопки перемикання -->
+          <div class="view-toggle">
+            <button class="toggle-btn active" id="listViewBtn">📄 Список</button>
+            <button class="toggle-btn" id="previewViewBtn">🖼️ З превью</button>
+          </div>
+        </div>
+        <ul class="schedule-list" id="live-schedule">
+          <li style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">
+            Завантаження програми...
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Інформаційна панель -->
+    <div class="info-panel">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">🎬</div>
+          <div class="info-label">Відео в програмі</div>
+          <div class="info-value" id="stat-total">0</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">▶️</div>
+          <div class="info-label">Зараз відтворюється</div>
+          <div class="info-value" id="stat-current">-</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">⏰</div>
+          <div class="info-label">Час початку</div>
+          <div class="info-value" id="stat-start-time">--:--</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">🔄</div>
+          <div class="info-label">Режим</div>
+          <div class="info-value">24/7 LIVE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Примітка -->
+    <div class="notice">
+      <div class="notice-icon">ℹ️</div>
+      <div class="notice-content">
+        <h3>Це пряма трансляція 24/7</h3>
+        <p>
+          Ви дивитесь синхронізовану цілодобову трансляцію церковних служінь та проповідей.
+          Всі глядачі бачать одне й те саме в реальному часі, як на справжньому LIVE стрімі.
+          Програма оновлюється автоматично щодня.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Підключення бібліотеки -->
+  <script src="youtube-stream-sync.js"></script>
+
+  <script>
+    // Ініціалізація LIVE стріму (БЕЗ зайвих контролів)
+    const liveStream = new YouTubeStreamSync({
+      container: '#live-player',
+      playlistUrl: 'https://raw.githubusercontent.com/christian-word/hristian-media/main/json/livestream_daily.json',
+      
+      // Налаштування
+      theme: 'dark',
+      width: '100%',
+      aspectRatio: '16:9',
+      autoplay: false,
+      
+      // Приховуємо вбудовані елементи (ми створили свої)
+      showSchedule: false,
+      showControls: false,
+      
+      // Callbacks
+      onReady: (instance) => {
+        console.log('🔴 LIVE стрім готовий!');
+        initLiveSchedule(instance);
+        updateStats(instance);
+      },
+      
+      onPlay: (index) => {
+        console.log('▶️ Трансляція розпочата');
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'inline-flex';
+        document.getElementById('qualitySelect').disabled = false;
+        document.getElementById('timezoneSelect').disabled = false;
+        document.getElementById('playerBlocker').classList.add('hidden');
+        updateCurrentVideo(liveStream);
+        updateLiveSchedule(liveStream);
+      },
+      
+      onVideoChange: (index, video) => {
+        console.log('🔄 Зміна програми:', video.title);
+        updateCurrentVideo(liveStream);
+        updateLiveSchedule(liveStream);
+      },
+      
+      onError: (error) => {
+        console.error('❌ Помилка стріму:', error);
+        alert('Помилка завантаження трансляції. Спробуйте оновити сторінку.');
+      }
+    });
+
+    // НОВА: Змінна для режиму відображення
+    let showPreview = false;
+
+    // НОВА: Перемикання режимів
+    document.getElementById('listViewBtn').addEventListener('click', () => {
+      showPreview = false;
+      document.getElementById('listViewBtn').classList.add('active');
+      document.getElementById('previewViewBtn').classList.remove('active');
+      if (liveStream.broadcastProgram) {
+        initLiveSchedule(liveStream);
+        updateLiveSchedule(liveStream);
+      }
+    });
+
+    document.getElementById('previewViewBtn').addEventListener('click', () => {
+      showPreview = true;
+      document.getElementById('previewViewBtn').classList.add('active');
+      document.getElementById('listViewBtn').classList.remove('active');
+      if (liveStream.broadcastProgram) {
+        initLiveSchedule(liveStream);
+        updateLiveSchedule(liveStream);
+      }
+    });
+
+    // Кнопки управління
+    document.getElementById('startBtn').addEventListener('click', () => {
+      liveStream.play();
+    });
+
+    document.getElementById('stopBtn').addEventListener('click', () => {
+      liveStream.stop();
+      document.getElementById('startBtn').style.display = 'inline-flex';
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('qualitySelect').disabled = true;
+      document.getElementById('timezoneSelect').disabled = true;
+      document.getElementById('playerBlocker').classList.remove('hidden');
+    });
+
+    document.getElementById('qualitySelect').addEventListener('change', (e) => {
+      liveStream.setQuality(e.target.value);
+    });
+
+    document.getElementById('timezoneSelect').addEventListener('change', (e) => {
+      liveStream.options.timezone = parseInt(e.target.value);
+      liveStream.play();
+    });
+
+    // Ініціалізація розкладу
+    function initLiveSchedule(stream) {
+      const schedule = stream.getSchedule();
+      const startTime = stream.getBroadcastStartTime();
+      const container = document.getElementById('live-schedule');
+      
+      container.innerHTML = '';
+      
+      schedule.forEach((video, index) => {
+        const li = document.createElement('li');
+        li.className = 'schedule-item' + (showPreview ? ' with-preview' : '');
+        li.dataset.index = index;
+        
+        const videoTime = new Date(startTime.getTime() + video.startTime * 1000);
+        const hours = videoTime.getHours().toString().padStart(2, '0');
+        const minutes = videoTime.getMinutes().toString().padStart(2, '0');
+        
+        const durationMin = Math.floor(video.duration / 60);
+        const durationSec = video.duration % 60;
+        
+        // НОВА: Різна розмітка залежно від режиму
+        if (showPreview) {
+          // Режим з превью
+          li.innerHTML = `
+            <div class="item-preview">
+              <img src="https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg" alt="Preview">
+              <div class="preview-play-icon">▶</div>
+            </div>
+            <div class="item-content">
+              <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                <span class="item-number">${index + 1}</span>
+                <div class="item-title">${video.title || 'Програма #' + (index + 1)}</div>
+              </div>
+              <div class="item-meta">
+                <span>🕐 ${hours}:${minutes}</span>
+                <span>⏱️ ${durationMin}:${durationSec.toString().padStart(2, '0')}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          // Звичайний режим (як раніше)
+          li.innerHTML = `
+            <div style="display: flex; align-items: flex-start;">
+              <span class="item-number">${index + 1}</span>
+              <div style="flex: 1;">
+                <div class="item-title">${video.title || 'Програма #' + (index + 1)}</div>
+                <div class="item-meta">
+                  <span>🕐 ${hours}:${minutes}</span>
+                  <span>⏱️ ${durationMin}:${durationSec.toString().padStart(2, '0')}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        container.appendChild(li);
+      });
+    }
+
+    // Оновлення розкладу
+    function updateLiveSchedule(stream) {
+      const currentIndex = stream.getCurrentIndex();
+      const items = document.querySelectorAll('.schedule-item');
+      
+      items.forEach((item, index) => {
+        item.classList.remove('current', 'played');
+        
+        const existingBadge = item.querySelector('.status-live-small');
+        if (existingBadge) {
+          existingBadge.remove();
+        }
+        
+        if (index < currentIndex) {
+          item.classList.add('played');
+        } else if (index === currentIndex) {
+          item.classList.add('current');
+          
+          const badge = document.createElement('span');
+          badge.className = 'status-live-small';
+          badge.textContent = 'В ЕФІРІ';
+          item.querySelector('.item-meta').appendChild(badge);
+          
+          item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+
+    // Оновлення поточного відео
+    function updateCurrentVideo(stream) {
+      const current = stream.getCurrentVideo();
+      const currentIndex = stream.getCurrentIndex();
+      
+      if (current) {
+        document.getElementById('current-video-title').textContent = 
+          current.title || 'Програма #' + (currentIndex + 1);
+      }
+    }
+
+    // Оновлення статистики
+    function updateStats(stream) {
+      const schedule = stream.getSchedule();
+      const currentIndex = stream.getCurrentIndex();
+      const startTime = stream.getBroadcastStartTime();
+      
+      document.getElementById('stat-total').textContent = schedule.length;
+      document.getElementById('stat-current').textContent = 
+        currentIndex >= 0 ? `#${currentIndex + 1}` : '-';
+      document.getElementById('stat-start-time').textContent = 
+        startTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+    }
+  </script>
+</body>
+</html>
