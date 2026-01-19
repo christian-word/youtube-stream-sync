@@ -118,6 +118,72 @@
       gap: 8px;
     }
 
+    .controls-bar {
+      background: #252525;
+      padding: 20px 25px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-live {
+      padding: 14px 30px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-start {
+      background: #ef4444;
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-start:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    }
+
+    .btn-stop {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-stop:hover {
+      background: #4b5563;
+    }
+
+    .quality-select {
+      padding: 14px 20px;
+      border-radius: 50px;
+      border: 2px solid #3a3a3a;
+      background: #1a1a1a;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      flex: 1;
+      min-width: 150px;
+      transition: all 0.3s;
+    }
+
+    .quality-select:hover {
+      border-color: #D4AF37;
+    }
+
+    .quality-select:focus {
+      outline: none;
+      border-color: #D4AF37;
+    }
+
     /* Розклад з ПРЕВЬЮ */
     .schedule-section {
       background: #1a1a1a;
@@ -500,6 +566,14 @@
         padding: 10px;
       }
 
+      .controls-bar {
+        flex-direction: column;
+      }
+
+      .btn-live, .quality-select {
+        width: 100%;
+      }
+
       .schedule-item.with-preview {
         flex-direction: column;
       }
@@ -541,6 +615,33 @@
         </div>
 
         <div id="live-player"></div>
+
+        <div class="controls-bar">
+          <button class="btn-live btn-start" id="startBtn">
+            <span>🔴</span>
+            <span>Дивитися трансляцію</span>
+          </button>
+          <button class="btn-live btn-stop" id="stopBtn" style="display: none;">
+            <span>⏹</span>
+            <span>Зупинити</span>
+          </button>
+          <select class="quality-select" id="qualitySelect" disabled>
+            <option value="default">📡 Якість: Авто</option>
+            <option value="hd1080">⚡ 1080p (Full HD)</option>
+            <option value="large">🖥️ 720p (HD)</option>
+            <option value="medium">📺 480p</option>
+            <option value="small">📱 360p</option>
+          </select>
+          <select class="quality-select" id="timezoneSelect" disabled>
+            <option value="0">⏰ Поточний час</option>
+            <option value="3600">⏩ +1 година</option>
+            <option value="7200">⏩ +2 години</option>
+            <option value="10800">⏩ +3 години</option>
+            <option value="-3600">⏪ -1 година</option>
+            <option value="-7200">⏪ -2 години</option>
+            <option value="-10800">⏪ -3 години</option>
+          </select>
+        </div>
       </div>
 
       <div class="schedule-section">
@@ -747,6 +848,32 @@
 
       updateScheduleHighlight(stream);
     }
+
+    // Кнопки управління
+    document.getElementById('startBtn').addEventListener('click', () => {
+      liveStream.play();
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('stopBtn').style.display = 'inline-flex';
+      document.getElementById('qualitySelect').disabled = false;
+      document.getElementById('timezoneSelect').disabled = false;
+    });
+
+    document.getElementById('stopBtn').addEventListener('click', () => {
+      liveStream.stop();
+      document.getElementById('startBtn').style.display = 'inline-flex';
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('qualitySelect').disabled = true;
+      document.getElementById('timezoneSelect').disabled = true;
+    });
+
+    document.getElementById('qualitySelect').addEventListener('change', (e) => {
+      liveStream.setQuality(e.target.value);
+    });
+
+    document.getElementById('timezoneSelect').addEventListener('change', (e) => {
+      liveStream.options.timezone = parseInt(e.target.value);
+      liveStream.play(); // Перезапуск з новим часом
+    });
 
     // Оновлення підсвітки поточного відео
     function updateScheduleHighlight(stream) {
