@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мінімальна інтеграція - YouTube Sync Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+        }
+
+        #player-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #000;
+        }
+
+        #player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Контейнер для плеєра -->
+    <div id="player-container"></div>
+
+    <!-- Підключення бібліотеки -->
+    <script src="youtube-sync-player.js"></script>
+
+    <!-- 
+        МІНІМАЛЬНИЙ КОД ІНТЕГРАЦІЇ 
+        Всього 5 рядків для запуску!
+    -->
+    <script>
+        const player = new YouTubeSyncPlayer({
+            containerId: 'player-container',
+            videoId: 'jfKfPfyJRdk',  // Замініть на ваш YouTube video ID
+            startDate: '2026-01-27T00:00:00Z'  // Замініть на дату початку трансляції
+        });
+    </script>
+</body>
+</html>
