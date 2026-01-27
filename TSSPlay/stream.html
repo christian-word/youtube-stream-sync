@@ -6,7 +6,6 @@
     <title>✟ YouTube Стрім-24/7 | Дім Євангелія</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta property="og:image" content="https://raw.githubusercontent.com/christian-word/hristian-media/main/ico/strim.png">
     <style>
         * {
             margin: 0;
@@ -14,7 +13,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #0E0E10;
             color: #EFEFEF;
             min-height: 100vh;
@@ -37,28 +36,16 @@
             position: relative;
             width: 100%;
             height: 0;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* Співвідношення 16:9 */
+            background: #000;
         }
-        #player {
+        /* Стилі для самого плеєра та iframe */
+        #player, #player iframe {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        #youtube-player-iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        #youtube-player-iframe iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             border: none;
         }
         #live-indicator {
@@ -73,9 +60,9 @@
             border-radius: 50px;
             font-size: 13px;
             font-weight: 700;
-            z-index: 10;
+            z-index: 15; /* Вище за оверлей */
             color: white;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            pointer-events: none;
         }
         #live-indicator span {
             width: 10px;
@@ -94,13 +81,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: #000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 20px;
             z-index: 100;
+            transition: opacity 0.5s ease;
         }
         .spinner {
             width: 60px;
@@ -110,39 +98,19 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg) }
-            100% { transform: rotate(360deg) }
-        }
-        .loading span {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-        }
+        @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+        
         .stream-info {
             max-width: 1400px;
             width: 100%;
             margin-top: 20px;
             text-align: center;
-            padding: 20px;
         }
         .stream-info h1 {
             font-family: 'Playfair Display', serif;
             font-size: 2rem;
-            margin-bottom: 10px;
             color: #D4AF37;
-        }
-        .stream-info p {
-            color: #A0A0A0;
-            font-size: 1rem;
-        }
-        @media (max-width: 768px) {
-            .stream-info h1 {
-                font-size: 1.5rem;
-            }
-            .stream-info p {
-                font-size: 0.9rem;
-            }
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -155,20 +123,20 @@
     <div id="player-container">
         <div id="player-wrapper">
             <div id="player"></div>
+            
             <div id="live-indicator"><span></span>LIVE</div>
+            
             <div class="loading" id="loadingIndicator">
                 <div class="spinner"></div>
-                <span>Завантаження...</span>
+                <span>Синхронізація ефіру...</span>
             </div>
         </div>
     </div>
 
-    <!-- Подключение библиотек -->
     <script src="stream-key-manager.js"></script>
     <script src="youtube-stream-sync.js"></script>
 
     <script>
-        // Инициализация менеджера ключей с ОТНОСИТЕЛЬНЫМИ ПУТЯМИ
         const keyManager = new StreamKeyManager({
             keysDatabaseUrl: 'keys.json',
             guestPlaylistUrl: 'guest.json',
@@ -176,32 +144,21 @@
             keyParamName: 'stream_key'
         });
 
-        // Получение плейлиста по ключу
         keyManager.getPlaylistUrl().then(playlistUrl => {
-            // Получение информации о ключе
             keyManager.getKeyInfo().then(keyInfo => {
                 document.getElementById('streamTitle').textContent = keyInfo.name;
                 document.getElementById('streamDescription').textContent = keyInfo.description || '24/7 трансляція';
             });
 
-            // Инициализация стрима
             const stream = new YouTubeStreamSync({
-                containerId: 'player',
+                containerId: 'player', // Вказуємо на чистий div
                 playlistUrl: playlistUrl,
                 autoPlay: true,
                 debug: true,
-                
-                onReady: (player) => {
-                    console.log('Стрім готовий');
-                    document.getElementById('loadingIndicator').style.display = 'none';
-                },
-                
-                onVideoChange: (data) => {
-                    console.log('Поточне відео:', data.video.title);
-                },
-                
-                onError: (error) => {
-                    console.error('Помилка:', error);
+                onReady: () => {
+                    const loader = document.getElementById('loadingIndicator');
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
                 }
             });
         });
