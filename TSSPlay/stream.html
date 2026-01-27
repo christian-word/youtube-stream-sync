@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✟ YouTube Стрім-24/7 | Дім Євангелія</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta property="og:image" content="https://raw.githubusercontent.com/christian-word/hristian-media/main/ico/strim.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            background: #0E0E10;
+            color: #EFEFEF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        #player-container {
+            max-width: 1400px;
+            width: 100%;
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            margin-top: 20px;
+        }
+        #player-wrapper {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
+        }
+        #player-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #live-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.95);
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10;
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        #live-indicator span {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(212, 175, 55, 0.2);
+            border-top: 5px solid #D4AF37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg) }
+            100% { transform: rotate(360deg) }
+        }
+        .loading span {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .stream-info {
+            max-width: 1400px;
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+        }
+        .stream-info h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #D4AF37;
+        }
+        .stream-info p {
+            color: #A0A0A0;
+            font-size: 1rem;
+        }
+        @media (max-width: 768px) {
+            .stream-info h1 {
+                font-size: 1.5rem;
+            }
+            .stream-info p {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stream-info">
+        <h1 id="streamTitle">Завантаження...</h1>
+        <p id="streamDescription">Підготовка трансляції...</p>
+    </div>
+
+    <div id="player-container">
+        <div id="player-wrapper">
+            <div id="player"></div>
+            <div id="live-indicator"><span></span>LIVE</div>
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <span>Завантаження...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение библиотек -->
+    <script src="stream-key-manager.js"></script>
+    <script src="youtube-stream-sync.js"></script>
+
+    <script>
+        // Инициализация менеджера ключей
+        const keyManager = new StreamKeyManager({
+            keysDatabaseUrl: 'https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/keys.json',
+            guestPlaylistUrl: 'https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/guest.json',
+            keySource: 'url',
+            keyParamName: 'stream_key'
+        });
+
+        // Получение плейлиста по ключу
+        keyManager.getPlaylistUrl().then(playlistUrl => {
+            // Получение информации о ключе
+            keyManager.getKeyInfo().then(keyInfo => {
+                document.getElementById('streamTitle').textContent = keyInfo.name;
+                document.getElementById('streamDescription').textContent = keyInfo.description || '24/7 трансляція';
+            });
+
+            // Инициализация стрима
+            const stream = new YouTubeStreamSync({
+                containerId: 'player-container',
+                playlistUrl: playlistUrl,
+                autoPlay: true,
+                debug: true,
+                
+                onReady: (player) => {
+                    console.log('Стрім готовий');
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                },
+                
+                onVideoChange: (data) => {
+                    console.log('Поточне відео:', data.video.title);
+                },
+                
+                onError: (error) => {
+                    console.error('Помилка:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✟ YouTube Стрім-24/7 | Дім Євангелія</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gold: #D4AF37;
+            --primary-green: #2D6A4F;
+            --primary-blue: #457B9D;
+            --text-dark: #2B2D42;
+            --text-gray: #6B7280;
+            --bg-cream: #FAF9F6;
+            --white: #FFFFFF;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            background: linear-gradient(135deg, #0E0E10 0%, #1A1A2E 100%);
+            color: #EFEFEF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            color: #EFEFEF;
+            margin-bottom: 60px;
+        }
+        .logo i {
+            font-size: 3rem;
+            color: var(--primary-gold);
+        }
+        .logo-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-text p {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            margin-top: 8px;
+        }
+        .streams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+        .stream-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 32px;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .stream-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-gold), var(--primary-green));
+        }
+        .stream-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-gold);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2);
+        }
+        .stream-card i {
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+        }
+        .stream-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+            color: var(--primary-gold);
+            font-weight: 700;
+        }
+        .stream-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #A0A0A0;
+            margin-bottom: 24px;
+        }
+        .stream-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-green));
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+        }
+        .stream-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.6);
+        }
+        .stream-btn i {
+            font-size: 1.2rem;
+        }
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .streams-grid {
+                grid-template-columns: 1fr;
+            }
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo i {
+                font-size: 2.5rem;
+            }
+            .logo-text h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="#" class="logo">
+            <i class="fas fa-church"></i>
+            <div class="logo-text">
+                <h1>✟ Дім Євангелія</h1>
+                <p>Віртуальна трансляція 24/7</p>
+            </div>
+        </a>
+
+        <div class="streams-grid">
+            <div class="stream-card">
+                <i class="fas fa-city"></i>
+                <h2>Київська церква</h2>
+                <p>Трансляція для громади Київ. Проповіді, служіння та богослужіння.</p>
+                <a href="stream.html?stream_key=church_kiev_7h3j9k2l5m8n" class="stream-btn">
+                    <i class="fas fa-play-circle"></i> Дивитися стрім
+                </a>
+            </div>
+
+            <div class="stream-card">
+                <i class="fas fa-city"></i>
+                <h2>Львівська церква</h2>
+                <p>Трансляція для громади Львів. Проповіді, служіння та богослужіння.</p>
+                <a href="stream.html?stream_key=church_lviv_4d6f8g2h5j7k" class="stream-btn">
+                    <i class="fas fa-play-circle"></i> Дивитися стрім
+                </a>
+            </div>
+
+            <div class="stream-card">
+                <i class="fas fa-city"></i>
+                <h2>Одеська церква</h2>
+                <p>Трансляція для громади Одеса. Проповіді, служіння та богослужіння.</p>
+                <a href="stream.html?stream_key=church_odessa_9p2q5r8s3t6u" class="stream-btn">
+                    <i class="fas fa-play-circle"></i> Дивитися стрім
+                </a>
+            </div>
+
+            <div class="stream-card">
+                <i class="fas fa-users"></i>
+                <h2>Гостьовий режим</h2>
+                <p>Демо-трансляція для всіх гостей. Ознайомчий контент.</p>
+                <a href="stream.html" class="stream-btn">
+                    <i class="fas fa-play-circle"></i> Дивитися демо
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Дім Євангелія. Всі права захищені.</p>
+        </div>
+    </div>
+</body>
+</html>

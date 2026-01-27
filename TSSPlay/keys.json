@@ -1,0 +1,34 @@
+﻿{
+  "version": "1.0",
+  "lastUpdated": "2026-01-27T10:00:00Z",
+  "playlists": [
+    {
+      "key": "church_kiev_7h3j9k2l5m8n",
+      "name": "Київська церква",
+      "description": "Трансляція для громади Київ",
+      "url": "https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/church_kiev.json",
+      "active": true,
+      "expiresAt": "2027-01-27T00:00:00Z"
+    },
+    {
+      "key": "church_lviv_4d6f8g2h5j7k",
+      "name": "Львівська церква",
+      "description": "Трансляція для громади Львів",
+      "url": "https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/church_lviv.json",
+      "active": true,
+      "expiresAt": "2027-01-27T00:00:00Z"
+    },
+    {
+      "key": "church_odessa_9p2q5r8s3t6u",
+      "name": "Одеська церква",
+      "description": "Трансляція для громади Одеса",
+      "url": "https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/church_odessa.json",
+      "active": true,
+      "expiresAt": "2027-01-27T00:00:00Z"
+    }
+  ],
+  "guestPlaylist": {
+    "url": "https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/guest.json",
+    "name": "Гость"
+  }
+}
