@@ -9,10 +9,10 @@ class StreamKeyManager {
     constructor(config = {}) {
         this.config = {
             // URL базы данных ключей
-            keysDatabaseUrl: config.keysDatabaseUrl || 'https://your-domain.com/playlists/keys.json',
+            keysDatabaseUrl: config.keysDatabaseUrl || 'keys.json',
             
             // Резервный плейлист для гостей
-            guestPlaylistUrl: config.guestPlaylistUrl || 'https://your-domain.com/playlists/guest.json',
+            guestPlaylistUrl: config.guestPlaylistUrl || 'guest.json',
             
             // Источник ключа: 'url', 'localStorage', 'cookie', 'manual'
             keySource: config.keySource || 'url',
