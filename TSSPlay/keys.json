@@ -4,7 +4,7 @@
   "playlists": [
     {
       "key": "church_kiev_7h3j9k2l5m8n",
-      "name": "Київська церква",
+      "name": "Київська церква ",
       "description": "Трансляція для громади Київ",
       "url": "https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/church_kiev.json",
       "active": true,
@@ -31,4 +31,5 @@
     "url": "https://raw.githubusercontent.com/christian-word/hristian-media/main/playlists/guest.json",
     "name": "Гость"
   }
+
 }
